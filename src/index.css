@@ -1,0 +1,22 @@
+@tailwind utilities;
+@import "tailwindcss";
+
+html {
+  background-color: white;
+  color: black;
+}
+
+.dark {
+  background-color: #111827; /* Темный фон */
+  color: white;
+}
+
+.dark input {
+  background-color: white;
+  color: black
+}
+
+.dark button {
+  background-color: white;
+  color: black;
+}
