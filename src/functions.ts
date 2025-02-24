@@ -1,4 +1,4 @@
-import { User } from "./types"
+import { User, WeatherData } from "./types"
 
 export const getDataBaseUsers = (): User[] => {
   const storage = localStorage.getItem('users')
@@ -24,5 +24,14 @@ export const getCurrentLocation = () => {
       },
       (error) => reject(new Error(`Ошибка геолокации: ${error.message}`))
     );
+  });
+};
+
+/** Средняя скользящая */
+export function calculateMovingAverage(data: WeatherData[], windowSize: number): WeatherData[] {
+  return data.map((_, index, array) => {
+    if (index < windowSize - 1) return { ...array[index], temperature: NaN };
+    const avgTemp = array.slice(index - windowSize + 1, index + 1).reduce((sum, item) => sum + item.temperature, 0) / windowSize;
+    return { ...array[index], temperature: avgTemp };
   });
 };

@@ -6,47 +6,22 @@ import { Button } from "../components/Button";
 import { ChangeThemeButton } from "../components/ChangeThemeButton";
 import { Input } from "../components/Input";
 import { Spinner } from "../components/Spinner";
-import { logoutHandler } from "../functions";
+import { calculateMovingAverage, logoutHandler } from "../functions";
 import { fetchWeather } from "../service";
-import { GetWeatherRequestBody } from "../types";
-
-/** Данные для графиков */
-interface WeatherData {
-  time: string;
-  temperature: number;
-  humidity: number;
-}
-
-/** Вид графика */
-type Mode = 'average' | 'line' | 'bar'
+import { ChartMode, GetWeatherRequestBody, WeatherData } from "../types";
 
 /** Страница с графиками */
 export const WeatherPage: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<WeatherData[]>([]);
   const [isLoading, setIsLoading] = useState(false)
-  const [mode, setMode] = useState<Mode>('line');
+  const [mode, setMode] = useState<ChartMode>('line');
   const [range, setRange] = useState<GetWeatherRequestBody>({
     start_date: '2025-01-01',
-    end_date: '2025-01-30',
+    end_date: '2025-01-02',
   });
+  const [averageSize, setAverageSize] = useState<number>(7);
 
-  /** Изменить даты */
-  const setRangeHandler = (key: keyof GetWeatherRequestBody, value: string) => {
-    const prepared = {
-      ...range,
-      [key]: value
-    }
-
-    if (prepared.end_date && prepared.start_date > prepared.end_date) {
-      prepared['end_date'] = prepared.start_date
-    }
-
-    if (prepared.start_date && prepared.end_date < prepared.start_date) {
-      prepared['start_date'] = prepared.end_date
-    }
-    setRange(prepared)
-  }
 
   /** Получить данные */
   const fetchWeatherHandler = async () => {
@@ -65,21 +40,30 @@ export const WeatherPage: React.FC = () => {
 
   useEffect(() => {
     fetchWeatherHandler();
-  }, [range]);
+  }, [range, averageSize]);
 
-  /** Средняя скользящая */
-  const calculateMovingAverage = (data: WeatherData[], windowSize: number): WeatherData[] => {
-    return data.map((_, index, array) => {
-      if (index < windowSize - 1) return { ...array[index], temperature: NaN };
-      const avgTemp = array.slice(index - windowSize + 1, index + 1).reduce((sum, item) => sum + item.temperature, 0) / windowSize;
-      return { ...array[index], temperature: avgTemp };
-    });
-  };
+  /** Изменить даты */
+  const setRangeHandler = (key: keyof GetWeatherRequestBody, value: string) => {
+    const prepared = {
+      ...range,
+      [key]: value
+    }
 
-  const movingAverageData = calculateMovingAverage(data, 14);
+    if (prepared.end_date && prepared.start_date > prepared.end_date) {
+      prepared['end_date'] = prepared.start_date
+    }
+
+    if (prepared.start_date && prepared.end_date < prepared.start_date) {
+      prepared['start_date'] = prepared.end_date
+    }
+    setRange(prepared)
+  }
+
+  /** Средняя скользящая для графика */
+  const movingAverageData = useMemo(() => calculateMovingAverage(data, averageSize), [averageSize, data]);
 
   /** Выбор вида графика */
-  const selectedChart: Record<Mode, ReactNode> = useMemo(() => ({
+  const selectedChart: Record<ChartMode, ReactNode> = useMemo(() => ({
     average: <LineChart width={1000} height={600} data={data}>
       <XAxis dataKey="time" />
       <YAxis label={{ value: "Температура (°C)", angle: -90, position: "insideLeft" }} />
@@ -113,10 +97,13 @@ export const WeatherPage: React.FC = () => {
         <h2 className="text-2xl font-bold">Статистика погоды</h2>
         <div className="flex gap-2">
           <ChangeThemeButton />
-          <Button onClick={() => {
-            logoutHandler();
-            navigate('/login')
-          }}>Выйти</Button>
+          <Button
+            onClick={() => {
+              logoutHandler();
+              navigate('/login')
+            }}>
+            Выйти
+          </Button>
         </div>
       </div>
       <div className="flex flex-col w-full">
@@ -130,6 +117,7 @@ export const WeatherPage: React.FC = () => {
         <div className="flex gap-4">
           <Input onChange={(e) => setRangeHandler('start_date', e)} type="date" value={range.start_date} />
           <Input onChange={(e) => setRangeHandler('end_date', e)} type="date" value={range.end_date} />
+          {mode === 'average' && <Input value={averageSize?.toString()} type="number" onChange={(s) => setAverageSize(+s)} />}
         </div>
       </div>
       <div className="flex justify-center h-[100%]">

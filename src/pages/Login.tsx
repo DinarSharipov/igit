@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
-import { ChangeThemeButton } from "../components/ChangeThemeButton";
 import { Input } from "../components/Input";
 import { getDataBaseUsers } from "../functions";
 import { User } from "../types";
@@ -11,6 +10,7 @@ type Mode = 'login' | 'registration'
 export const LoginPage: React.FC = () => {
   const [mode, setMode] = useState<Mode>('login')
   const [user, setUser] = useState<User>();
+  const [success, setSuccess] = useState<string>();
   const [error, setError] = useState<string>();
 
   const navigate = useNavigate();
@@ -67,6 +67,8 @@ export const LoginPage: React.FC = () => {
         setError('Пользователь с таким именем уже существует')
       } else {
         localStorage.setItem('users', JSON.stringify([...getDataBaseUsers(), user] as User[]));
+        setSuccess('Пользователь успешно зарегистрирован!');
+        setTimeout(() => setSuccess(undefined), 2000)
         setModeHandler('login')
       }
     }
@@ -75,7 +77,6 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="w-full flex flex-col items-center h-[100%] justify-center">
       <div className="py-4 px-8 border-1 border-slate-400 rounded-lg">
-        <ChangeThemeButton />
         <div className="flex flex-col items-center mb-8">
           <div className="text-4xl mb-4">Авторизация</div>
           <div className="flex gap-4">
@@ -92,7 +93,8 @@ export const LoginPage: React.FC = () => {
           <Button onClick={mode === 'login' ? handleLogin : handleRegistration}>
             {mode === 'login' ? 'Войти' : 'Зарегистрироваться'}
           </Button>
-          {error && <p className="text-red-600">{error}</p>}
+          {success && <p className="text-green-400">{success}</p>}
+          {error && <p className="text-red-600 font-bold">{error}</p>}
         </div>
       </div>
     </div >

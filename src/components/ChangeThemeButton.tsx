@@ -1,7 +1,7 @@
-import { FC, useEffect, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import { Button } from "./Button";
 
-export const ChangeThemeButton: FC = () => {
+export const ChangeThemeButton: FC = memo(() => {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
   );
@@ -22,4 +22,4 @@ export const ChangeThemeButton: FC = () => {
       {theme === "dark" ? "🌙" : "☀️"}
     </Button>
   )
-}
+})
