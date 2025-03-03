@@ -24,6 +24,9 @@ jobs:
       - name: Сборка проекта
         run: npm run build
 
+      - name: Проверка, что build/ создан
+        run: ls -la build || echo "Папка build не найдена!"
+
       - name: Деплой на GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
