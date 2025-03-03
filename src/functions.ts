@@ -9,6 +9,7 @@ export const logoutHandler = () => {
   localStorage.removeItem('token')
 }
 
+/** Получение координат */
 export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
     if (!("geolocation" in navigator)) {
