@@ -1,5 +1,6 @@
 import { User, WeatherData } from "./types"
 
+/** Получение списка пользователей из стораджа */
 export const getDataBaseUsers = (): User[] => {
   const storage = localStorage.getItem('users')
   return storage ? JSON.parse(storage) as User[] : []
