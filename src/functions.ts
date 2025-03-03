@@ -5,6 +5,7 @@ export const getDataBaseUsers = (): User[] => {
   return storage ? JSON.parse(storage) as User[] : []
 }
 
+/** Хэндлер удаления токена */
 export const logoutHandler = () => {
   localStorage.removeItem('token')
 }
