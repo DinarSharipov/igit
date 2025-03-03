@@ -5,5 +5,8 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   base: "/igit/",
+  build: {
+    outDir: "dist",
+  },
   plugins: [react(), tailwindcss(),],
 })
