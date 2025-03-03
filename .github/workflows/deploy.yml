@@ -24,11 +24,11 @@ jobs:
       - name: Сборка проекта
         run: npm run build
 
-      - name: Проверка, что build/ создан
-        run: ls -la build || echo "Папка build не найдена!"
+      - name: Проверка содержимого папки dist
+        run: ls -la dist || echo "Папка dist не найдена!"
 
       - name: Деплой на GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: build
+          folder: dist
